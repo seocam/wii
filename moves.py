@@ -10,6 +10,9 @@ INFINITY = float('Inf')
 def arg_parser():
     help_text = 'Classify time series using Dynamic Time Warp distance.'
     parser = argparse.ArgumentParser(description=help_text)
+    parser.add_argument('--sakoe-chiba', type=float, dest='sakoe_chiba',
+                        default=42, help=('Sakoe-Chiba band [0, 1]. '
+                                          'Defaults to 1.'))
     parser.add_argument('training', nargs=1,
                         help='Training data (text file)')
     parser.add_argument('test', nargs=1,
@@ -30,19 +33,17 @@ class TimeSeries(object):
         return time_series
 
 
-def DTWDistance(a, b):
+def DTWDistance(a, b, bandwidth=1):
     n = len(a)
     m = len(b)
-    DTW = [[0 for i in range(m)] for j in range(n)]
+    DTW = [[INFINITY for i in range(m)] for j in range(n)]
 
-    for i in range(n):
-        DTW[i][0] = INFINITY
-    for i in range(m):
-        DTW[0][i] = INFINITY
+    w = int(min(n, m) * bandwidth)
+
     DTW[0][0] = 0
 
-    for i in range(n):
-        for j in range(m):
+    for i in range(1, n):
+        for j in range(max(1, i-w), min(m, i+w+1)):
             cost = (a[i] - b[j]) ** 2
             DTW[i][j] = cost + min(DTW[i-1][j], DTW[i][j-1], DTW[i-1][j-1])
 
@@ -70,7 +71,8 @@ def main():
         guess_class = None
 
         for training_data in training:
-            distance = DTWDistance(test_data.series, training_data.series)
+            distance = DTWDistance(test_data.series, training_data.series,
+                                   args.sakoe_chiba)
             if distance < min_distance:
                 min_distance = distance
                 guess_class = training_data.cls
