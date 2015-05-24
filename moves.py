@@ -20,19 +20,33 @@ def arg_parser():
 class TimeSeries(object):
     def __init__(self):
         self.cls = None
-        self.series = []
+        self.series = ()
 
     @classmethod
     def from_string(klass, string):
         time_series = klass()
         time_series.cls, data = string.strip().split(' ', 1)
-        time_series.series = map(float, data.split(' '))
+        time_series.series = tuple(map(float, data.split(' ')))
         return time_series
 
 
 def DTWDistance(a, b):
-    import random
-    return random.randint(1, 12)
+    n = len(a)
+    m = len(b)
+    DTW = [[0 for i in range(m)] for j in range(n)]
+
+    for i in range(n):
+        DTW[i][0] = INFINITY
+    for i in range(m):
+        DTW[0][i] = INFINITY
+    DTW[0][0] = 0
+
+    for i in range(n):
+        for j in range(m):
+            cost = (a[i] - b[j]) ** 2
+            DTW[i][j] = cost + min(DTW[i-1][j], DTW[i][j-1], DTW[i-1][j-1])
+
+    return DTW[n-1][m-1]
 
 
 def parse_time_series_file(file_path):
@@ -56,7 +70,7 @@ def main():
         guess_class = None
 
         for training_data in training:
-            distance = DTWDistance(test, training)
+            distance = DTWDistance(test_data.series, training_data.series)
             if distance < min_distance:
                 min_distance = distance
                 guess_class = training_data.cls
