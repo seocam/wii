@@ -11,7 +11,7 @@ def arg_parser():
     help_text = 'Classify time series using Dynamic Time Warp distance.'
     parser = argparse.ArgumentParser(description=help_text)
     parser.add_argument('--sakoe-chiba', type=float, dest='sakoe_chiba',
-                        default=42, help=('Sakoe-Chiba band [0, 1]. '
+                        default=1, help=('Sakoe-Chiba band [0, 1]. '
                                           'Defaults to 1.'))
     parser.add_argument('training', nargs=1,
                         help='Training data (text file)')
