@@ -64,7 +64,8 @@ def DTWDistance(a, b, bandwidth=1, three_d=False):
                 print('Invalid input data')
                 sys.exit(1)
 
-        return sum(data) / 3.0
+        return sum(data)
+
 
     n = len(a)
     m = len(b)
