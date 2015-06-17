@@ -55,6 +55,9 @@ class TimeSeries3D(TimeSeries):
 
 
 def DTWDistance(a, b, bandwidth=1, three_d=False):
+
+    # If 3D is ON then execute the algorithm 3 times and return the sum
+    #   of the distances
     if three_d:
         data = []
         for i in range(3):
